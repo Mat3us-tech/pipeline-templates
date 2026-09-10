@@ -98,3 +98,4 @@ jobs:
   #     image_name: ${{ inputs.STACK_TYPE }}-app
   #     tag: ${{ github.sha }}
   
+ #teste
