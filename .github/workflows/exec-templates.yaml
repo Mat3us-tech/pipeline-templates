@@ -24,45 +24,55 @@ jobs:
     # Chama outro workflow reutilizável (template)
     uses: Mat3us-tech/pipeline-templates/.github/workflows/check-main-sync.yaml@main
 
-  #  Job 4: build Docker para Next.js
-  docker-build:
-    needs: [check-sync] # Só roda se o build do Next terminar
+
+
+  next-build:
+    needs: [check-sync] # Só roda se o check-sync terminar
     if: ${{ inputs.STACK_TYPE == 'next' || inputs.STACK_TYPE == 'react' }}
-    uses: Mat3us-tech/pipeline-templates/.github/workflows/nixpacks-build.yaml@main
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    uses: Mat3us-tech/pipeline-templates/.github/workflows/next-build.yaml@main
     with:
-      image_name: ${{ inputs.STACK_TYPE }}-app # Nome da imagem Docker
-      context_dir: .    # Diretório base do build (raiz do projeto)
-      version: ${{ inputs.version || '22' }}
+      node_version: ${{ inputs.version || '22' }} # Passa a versão do Node.js para o template
 
-  validate-structure:
-    needs: [check-sync]
-    uses: Mat3us-tech/pipeline-templates/.github/workflows/validate-structure.yaml@main
-    with:
-      kustomize_repo: Mat3us-tech/kustomize
-      app_name: ${{ github.event.repository.name }}
-    secrets:
-      KUSTOMIZE_TOKEN: ${{ secrets.KUSTOMIZE_TOKEN }}
+      
+  #  Job 4: build Docker para Next.js
+  # docker-build:
+  #   needs: [check-sync] # Só roda se o build do Next terminar
+  #    if: ${{ inputs.STACK_TYPE == 'next' || inputs.STACK_TYPE == 'react' }}
+  #   uses: Mat3us-tech/pipeline-templates/.github/workflows/nixpacks-build.yaml@main
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  #   with:
+  #     image_name: ${{ inputs.STACK_TYPE }}-app # Nome da imagem Docker
+  #     context_dir: .    # Diretório base do build (raiz do projeto)
+  #     version: ${{ inputs.version || '22' }}
 
-  deploy-k8s:
-    needs: [validate-structure, docker-build]
-    uses: Mat3us-tech/pipeline-templates/.github/workflows/k8s-deploy.yaml@main
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-    with:
-      image_name: ${{ inputs.STACK_TYPE }}-app:${{ github.sha }}
-      deployment_name: minha-app
-      container_name: minha-app
-      manifests_path: ./k8s
+  # validate-structure:
+  #   needs: [check-sync]
+  #   uses: Mat3us-tech/pipeline-templates/.github/workflows/validate-structure.yaml@main
+  #   with:
+  #     kustomize_repo: Mat3us-tech/kustomize
+  #     app_name: ${{ github.event.repository.name }}
+  #   secrets:
+  #     KUSTOMIZE_TOKEN: ${{ secrets.KUSTOMIZE_TOKEN }}
 
-  validate-k8s:
-    needs: [deploy-k8s]
-    uses: Mat3us-tech/pipeline-templates/.github/workflows/k8s-validate.yaml@main
-    with:
-      deployment_name: minha-app
-      namespace: default
+  # deploy-k8s:
+  #   needs: [validate-structure, docker-build]
+  #   uses: Mat3us-tech/pipeline-templates/.github/workflows/k8s-deploy.yaml@main
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #   with:
+  #     image_name: ${{ inputs.STACK_TYPE }}-app:${{ github.sha }}
+  #     deployment_name: minha-app
+  #     container_name: minha-app
+  #     manifests_path: ./k8s
+
+  # validate-k8s:
+  #   needs: [deploy-k8s]
+  #   uses: Mat3us-tech/pipeline-templates/.github/workflows/k8s-validate.yaml@main
+  #   with:
+  #     deployment_name: minha-app
+  #     namespace: default
 
   # docker-builder-gcp:
   #   needs: [check-sync]
