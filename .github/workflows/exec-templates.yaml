@@ -24,12 +24,12 @@ jobs:
     # Chama outro workflow reutilizável (template)
     uses: Mat3us-tech/pipeline-templates/.github/workflows/check-main-sync.yaml@main
 
-  # next-build:
-  #   needs: [check-sync] # Só roda se o check-sync terminar
-  #   if: ${{ inputs.STACK_TYPE == 'next' || inputs.STACK_TYPE == 'react' }}
-  #   uses: Mat3us-tech/pipeline-templates/.github/workflows/next-build.yaml@main
-  #   with:
-  #     node_version: ${{ inputs.version || '22' }} # Passa a versão do Node.js para o template
+  next-build:
+    needs: [check-sync] # Só roda se o check-sync terminar
+    if: ${{ inputs.STACK_TYPE == 'next' || inputs.STACK_TYPE == 'react' }}
+    uses: Mat3us-tech/pipeline-templates/.github/workflows/next-build.yaml@main
+    with:
+      node_version: ${{ inputs.version || '22' }} # Passa a versão do Node.js para o template
 
       
   #  Job 4: build Docker para Next.js
