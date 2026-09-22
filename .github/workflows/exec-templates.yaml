@@ -11,20 +11,18 @@ on:
       version: # Versão do Node.js a ser usada nos builds
         required: false
         type: string
-    secrets: 
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
+    # secrets: 
+    #   DOCKERHUB_USERNAME:
+    #     required: true
+    #   DOCKERHUB_TOKEN:
+    #     required: true
 
 jobs:
 
-  #  Job 1: verifica se a branch está sincronizada com a main
+  # Job 1: verifica se a branch está sincronizada com a main
   check-sync:
     # Chama outro workflow reutilizável (template)
     uses: Mat3us-tech/pipeline-templates/.github/workflows/check-main-sync.yaml@main
-
-
 
   # next-build:
   #   needs: [check-sync] # Só roda se o check-sync terminar
